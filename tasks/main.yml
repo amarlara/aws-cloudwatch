@@ -1,23 +1,33 @@
 ---
 # Check the Architecture of OS
-- name: Must be 64-bit
-  fail:
-    msg: "This role is intended for use only 64-bit"
-  when: (ansible_architecture != 'x86_64')
+#- name: Must be 64-bit
+#  fail:
+#    msg: "This role is intended for use only 64-bit"
+#  when: (ansible_architecture != 'x86_64')
 
 # Install the pacakge for Debian Family
-- name: Install deb file for Debian Family
-  apt:
-    deb: "https://s3.amazonaws.com/amazoncloudwatch-agent/{{ ansible_os_family | lower }}/amd64/latest/amazon-cloudwatch-agent.deb"
-    state: present
-  when: (ansible_os_family == 'Debian') or (ansible_os_family == 'Ubuntu')
- 
- # Install the pacakge
-- name: Install rpm file for Redhat | Amazon_linux | SUSE | CentOS Family
-  yum:
-    name: "https://s3.amazonaws.com/amazoncloudwatch-agent/{{ ansible_os_family | lower }}/amd64/latest/amazon-cloudwatch-agent.rpm"
-    state: present
-  when: (ansible_os_family == 'Centos') or (ansible_os_family == 'amazon_linux') or (ansible_os_family == 'Redhat') or (ansible_os_family == 'SUSE')
+#- name: Get Ansible OS Family
+#  debug:
+#    var: "{{ansible_distribution}}-{{ansible_os_family}}"
 
+#- name: Install deb file for Debian Family
+#  apt:
+#    deb: "https://s3.amazonaws.com/amazoncloudwatch-agent/{{ ansible_os_family | lower }}/amd64/latest/amazon-cloudwatch-agent.deb"
+#    state: present
+#    when: (ansible_os_family == 'Debian') or (ansible_os_family == 'Ubuntu')
+ 
+# Install the pacakge
+- name: Install rpm for CentOS
+  yum:
+    name: "https://s3.amazonaws.com/amazoncloudwatch-agent/{{ ansible_distribution | lower }}/amd64/latest/amazon-cloudwatch-agent.rpm"
+    state: present
+  when: ansible_distribution == 'Centos'
+  become: true
+- name: Install rpm for Amazon_linux
+  yum:
+    name: "https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
+    state: present
+  when: ansible_distribution == 'Amazon'
+  become: true
 # Config tasks.
-- include_tasks:  'config.yml'
+#- include_tasks:  'config.yml'
